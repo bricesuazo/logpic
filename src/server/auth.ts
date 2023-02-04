@@ -4,9 +4,8 @@ import {
   type NextAuthOptions,
   type DefaultSession,
 } from "next-auth";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { env } from "../env/server.mjs";
-import { prisma } from "./db";
+import { prisma } from "../server/db";
+import { CredentialsProvider } from "next-auth/providers";
 
 /**
  * Module augmentation for `next-auth` types.
@@ -46,8 +45,30 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  adapter: PrismaAdapter(prisma),
   providers: [
+    // CredentialsProvider({
+    //   name: "Credentials",
+    //   credentials: {
+    //     username: { label: "Username", type: "text", placeholder: "jsmith" },
+    //     password: { label: "Password", type: "password" },
+    //   },
+    //   async authorize(credentials) {
+    //     const user = await prisma.user.findUnique({
+    //       where: { username: credentials.username },
+    //     });
+    //     if (!user) {
+    //       throw new Error("No user found");
+    //     }
+    //     const passwordValid = await bcrypt.compare(
+    //       credentials.password,
+    //       user.password
+    //     );
+    //     if (!passwordValid) {
+    //       throw new Error("Invalid password");
+    //     }
+    //     return user;
+    //   },
+    // }),
     /**
      * ...add more providers here
      *
