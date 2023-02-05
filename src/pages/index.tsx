@@ -1,12 +1,8 @@
-import { type NextPage } from "next";
+import type { GetServerSidePropsContext, NextPage } from "next";
 import Link from "next/link";
-import { api } from "../utils/api";
+import { getServerAuthSession } from "../server/auth";
 
 const Home: NextPage = () => {
-  const wefse = api.employee.attendance.useMutation();
-  // wefse.mutate({
-  //   type: "time_in",
-  // });
   return (
     <>
       <main>
@@ -20,3 +16,29 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const session = await getServerAuthSession(context);
+
+  if (session && session.user.role === "EMPLOYEE") {
+    return {
+      redirect: {
+        destination: "/employee-dashboard",
+        permanent: false,
+      },
+    };
+  } else if (session && session.user.role === "HR") {
+    return {
+      redirect: {
+        destination: "/hr-dashboard",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+};

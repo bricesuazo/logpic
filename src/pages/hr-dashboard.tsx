@@ -23,13 +23,25 @@ const HRDashboard = () => {
         onSubmit={(e) => {
           e.preventDefault();
 
-          createEmployeeMutation.mutate({
-            id: employee.id,
-            email: employee.email,
-            first_name: employee.first_name,
-            last_name: employee.last_name,
-            password: employee.password,
-          });
+          void (async () => {
+            await createEmployeeMutation.mutateAsync({
+              id: employee.id,
+              email: employee.email,
+              first_name: employee.first_name,
+              last_name: employee.last_name,
+              password: employee.password,
+            });
+
+            await employeesQuery.refetch();
+
+            setEmployee({
+              id: "",
+              email: "",
+              first_name: "",
+              last_name: "",
+              password: "",
+            });
+          })();
         }}
       >
         <div className="flex items-center gap-x-2">
@@ -74,6 +86,7 @@ const HRDashboard = () => {
             required
             type="email"
             id="email"
+            value={employee.email}
             onChange={(e) => {
               setEmployee({ ...employee, email: e.target.value });
             }}
@@ -85,6 +98,7 @@ const HRDashboard = () => {
             required
             type="password"
             id="password"
+            value={employee.password}
             onChange={(e) => {
               setEmployee({ ...employee, password: e.target.value });
             }}
