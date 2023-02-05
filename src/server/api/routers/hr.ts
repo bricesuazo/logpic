@@ -28,4 +28,19 @@ export const hrRouter = createTRPCRouter({
         },
       });
     }),
+  getAllEmployeesWithAttendanceToday: hrProcedure.query(({ ctx }) => {
+    return ctx.prisma.employee.findMany({
+      include: {
+        Attendance: {
+          where: {
+            date: new Date().toLocaleDateString(),
+          },
+          take: 1,
+        },
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+  }),
 });

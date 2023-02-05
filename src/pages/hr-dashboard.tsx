@@ -1,11 +1,20 @@
 import { type GetServerSidePropsContext } from "next";
 import { getServerAuthSession } from "../server/auth";
 import { api } from "../utils/api";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Moment from "react-moment";
 
 const HRDashboard = () => {
   const createEmployeeMutation = api.hr.createEmployee.useMutation();
-  const employeesQuery = api.hr.getAllEmployees.useQuery();
+  const employeesQuery = api.hr.getAllEmployeesWithAttendanceToday.useQuery();
+  const [date, setDate] = useState<Date | undefined>();
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDate(new Date());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
   const [employee, setEmployee] = useState({
     id: "",
     email: "",
@@ -14,8 +23,61 @@ const HRDashboard = () => {
     password: "",
   });
   return (
-    <main>
-      <h1>HR Dashboard</h1>
+    <main className="mx-auto max-w-screen-lg space-y-8 p-4">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold">HR Dashboard</h1>
+        <p>
+          <Moment format="MMMM Do YYYY, h:mm:ss A">{date}</Moment>
+        </p>
+      </div>
+      <table className="w-full rounded border text-left text-sm">
+        <thead className="text-xs ">
+          <tr className="border-b">
+            {[
+              { id: 0, title: "ID" },
+              { id: 1, title: "Name" },
+              { id: 2, title: "Time In" },
+              { id: 3, title: "Break In" },
+              { id: 4, title: "Break Out" },
+              { id: 5, title: "Time Out" },
+            ].map((thead) => (
+              <th
+                key={thead.id}
+                scope="col"
+                className={`px-2 py-1 sm:px-6 sm:py-4 ${
+                  thead.id === 1 ? "hidden sm:block" : ""
+                }`}
+              >
+                {thead.title}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="overflow-y-visible">
+          {employeesQuery.data?.map((employee) => (
+            <tr key={employee.id} className="border-b text-xs sm:text-sm">
+              <td className="px-2 py-1 sm:px-6 sm:py-4">{employee.id}</td>
+              <td className="hidden px-2 py-1 sm:block sm:px-6 sm:py-4">
+                {employee.first_name + " " + employee.last_name}
+              </td>
+              <td className="px-2 py-1 sm:px-6 sm:py-4">
+                <div className="">
+                  <p>{employee.Attendance[0]?.time_in?.toLocaleTimeString()}</p>
+                </div>
+              </td>
+              <td className="px-2 py-1 sm:px-6 sm:py-4">
+                {employee.Attendance[0]?.break_in?.toLocaleTimeString()}
+              </td>
+              <td className="px-2 py-1 sm:px-6 sm:py-4">
+                {employee.Attendance[0]?.break_out?.toLocaleTimeString()}
+              </td>
+              <td className="px-2 py-1 sm:px-6 sm:py-4">
+                {employee.Attendance[0]?.time_out?.toLocaleTimeString()}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       <h3>Create Employee</h3>
       <form
