@@ -40,16 +40,16 @@ declare module "next-auth" {
   }
 }
 
-// declare module "next-auth/jwt" {
-//   interface JWT {
-//     id: string;
-//     first_name: string;
-//     last_name: string;
-//     email: string;
-//     image: string;
-//     role: "HR" | "EMPLOYEE";
-//   }
-// }
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    image: string | null;
+    role: "HR" | "EMPLOYEE";
+  }
+}
 
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks,
@@ -59,19 +59,42 @@ declare module "next-auth" {
  **/
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id;
-        session.user.first_name = user.first_name;
-        session.user.last_name = user.last_name;
-        session.user.email = user.email;
-        session.user.image = user.image;
-        session.user.role = user.role;
-
-        // session.user.role = user.role; <-- put other properties on the session here
+    jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.first_name = user.first_name;
+        token.last_name = user.last_name;
+        token.email = user.email;
+        token.image = user.image;
+        token.role = user.role;
+      }
+      return token;
+    },
+    session({ session, token }) {
+      if (token.id) {
+        session.user.id = token.id;
+        session.user.first_name = token.first_name;
+        session.user.last_name = token.last_name;
+        session.user.email = token.email;
+        session.user.image = token.image;
+        session.user.role = token.role;
       }
       return session;
     },
+
+    // jwt({ token, user }) {
+    //   console.log("🚀 ~ file: auth.ts:63 ~ jwt ~ user", user);
+    //   console.log("🚀 ~ file: auth.ts:63 ~ jwt ~ token", token);
+    //   if (user) {
+    //     token.id = user.id;
+    //     token.first_name = user.first_name;
+    //     token.last_name = user.last_name;
+    //     token.email = user.email;
+    //     token.image = user.image;
+    //     token.role = user.role;
+    //   }
+    //   return token;
+    // },
   },
   providers: [
     CredentialsProvider({
@@ -81,17 +104,16 @@ export const authOptions: NextAuthOptions = {
           label: "Type",
           type: "text",
           placeholder: "HR / EMPLOYEE",
-          value: "HR" || "EMPLOYEE",
         },
-        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        id: { label: "", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (
           !credentials ||
-          !credentials?.type ||
-          !credentials?.username ||
-          !credentials?.password
+          !credentials.type ||
+          !credentials.id ||
+          !credentials.password
         ) {
           throw new Error("Invalid credentials");
         }
@@ -101,7 +123,7 @@ export const authOptions: NextAuthOptions = {
 
         if (credentials.type === "HR") {
           const hr = await prisma.hR.findUnique({
-            where: { email: credentials.username },
+            where: { id: credentials.id },
           });
           if (!hr) {
             throw new Error("No user found");
@@ -116,7 +138,7 @@ export const authOptions: NextAuthOptions = {
           return { ...rest, role: "HR" };
         } else if (credentials.type === "EMPLOYEE") {
           const employee = await prisma.employee.findUnique({
-            where: { id: credentials.username },
+            where: { id: credentials.id },
           });
           if (!employee) {
             throw new Error("No user found");

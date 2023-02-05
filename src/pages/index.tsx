@@ -1,11 +1,15 @@
 import { type NextPage } from "next";
-
-import { api } from "../utils/api";
+import Link from "next/link";
 
 const Home: NextPage = () => {
   return (
     <>
-      <main></main>
+      <main>
+        <div className="flex gap-x-2">
+          <Link href="/hr-login">HR</Link>
+          <Link href="/employee-login">Employee</Link>
+        </div>
+      </main>
     </>
   );
 };
