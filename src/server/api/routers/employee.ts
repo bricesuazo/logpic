@@ -3,26 +3,41 @@ import { z } from "zod";
 import { createTRPCRouter, employeeProcedure } from "../trpc";
 
 export const employeeRouter = createTRPCRouter({
+  getAttendance: employeeProcedure.query(({ ctx }) => {
+    return ctx.prisma.attendance.findFirst({
+      where: {
+        AND: [
+          {
+            employee_id: ctx.session.user.id,
+          },
+          {
+            date: new Date().toLocaleDateString(),
+          },
+        ],
+      },
+      take: 1,
+    });
+  }),
   attendance: employeeProcedure
     .input(
       z.object({
-        type: z.enum(["time_in", "break_in", "break_out", "time_out"]),
+        type: z.enum(["TIME_IN", "BREAK_IN", "BREAK_OUT", "TIME_OUT"]),
         imageUrl: z.string(),
         id: z.string().optional(),
       })
     )
     .mutation(({ input, ctx }) => {
       switch (input.type) {
-        case "time_in":
+        case "TIME_IN":
           return ctx.prisma.attendance.create({
             data: {
               employee_id: ctx.session.user.id,
-              date: new Date(),
+              date: new Date().toLocaleDateString(),
               time_in: new Date(),
               time_in_image: input.imageUrl,
             },
           });
-        case "break_in":
+        case "BREAK_IN":
           return ctx.prisma.attendance.update({
             where: {
               id: input.id,
@@ -32,7 +47,7 @@ export const employeeRouter = createTRPCRouter({
               break_in_image: input.imageUrl,
             },
           });
-        case "break_out":
+        case "BREAK_OUT":
           return ctx.prisma.attendance.update({
             where: {
               id: input.id,
@@ -42,7 +57,7 @@ export const employeeRouter = createTRPCRouter({
               break_out_image: input.imageUrl,
             },
           });
-        case "time_out":
+        case "TIME_OUT":
           return ctx.prisma.attendance.update({
             where: {
               id: input.id,

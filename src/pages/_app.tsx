@@ -12,7 +12,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
-  console.log("🚀 ~ file: _app.tsx:15 ~ session", session);
   return (
     <>
       <Head>
