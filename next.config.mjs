@@ -9,7 +9,7 @@
 /** @type {import("next").NextConfig} */
 const config = {
   images: {
-    domains: ["picsum.photos", "firebasestorage.googleapis.com"],
+    domains: ["firebasestorage.googleapis.com"],
   },
   reactStrictMode: true,
 
