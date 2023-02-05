@@ -8,11 +8,11 @@ import ImageModal from "../components/ImageModal";
 const HRDashboard = () => {
   const createEmployeeMutation = api.hr.createEmployee.useMutation();
   const employeesQuery = api.hr.getAllEmployeesWithAttendanceToday.useQuery();
-  const [date, setDate] = useState<Date | undefined>();
+  const [time, setTime] = useState<string | undefined>();
   const [isOpenModal, setOpenModal] = useState({ link: "", isOpen: false });
   useEffect(() => {
     const interval = setInterval(() => {
-      setDate(new Date());
+      setTime(new Date().toLocaleTimeString());
     }, 1000);
 
     return () => clearInterval(interval);
@@ -37,8 +37,9 @@ const HRDashboard = () => {
       <main className="mx-auto max-w-screen-lg space-y-8 p-4">
         <div className="text-center">
           <h1 className="text-2xl font-bold">HR Dashboard</h1>
+
           <p>
-            <Moment format="MMMM Do YYYY, h:mm:ss A">{date}</Moment>
+            {new Date().toLocaleDateString()} {time}
           </p>
         </div>
         <table className="w-full rounded border text-left text-sm">
@@ -65,74 +66,81 @@ const HRDashboard = () => {
             </tr>
           </thead>
           <tbody className="overflow-y-visible">
-            {employeesQuery.data?.map((employee) => (
-              <tr key={employee.id} className="border-b text-xs sm:text-sm">
-                <td className="px-2 py-1 hover:bg-green-50 sm:px-6 sm:py-4">
-                  {employee.id}
-                </td>
-                <td className="hidden px-2 py-1 hover:bg-green-50 sm:block sm:px-6 sm:py-4">
-                  {employee.first_name + " " + employee.last_name}
-                </td>
-                <td
-                  className="cursor-pointer px-2 py-1 hover:bg-green-50 sm:px-6 sm:py-4"
-                  onClick={() => {
-                    employee.Attendance[0]?.time_in &&
-                      employee.Attendance[0]?.time_in_image &&
-                      setOpenModal({
-                        link: employee.Attendance[0]?.time_in_image,
-                        isOpen: true,
-                      });
-                  }}
-                >
-                  {employee.Attendance[0]?.time_in?.toLocaleTimeString()}
-                </td>
-                <td
-                  className="cursor-pointer px-2 py-1 hover:bg-green-50 sm:px-6 sm:py-4"
-                  onClick={() => {
-                    employee.Attendance[0]?.break_in &&
-                      employee.Attendance[0]?.break_in_image &&
-                      setOpenModal({
-                        link: employee.Attendance[0]?.break_in_image,
-                        isOpen: true,
-                      });
-                  }}
-                >
-                  {employee.Attendance[0]?.break_in?.toLocaleTimeString()}
-                </td>
-                <td
-                  className="cursor-pointer px-2 py-1 hover:bg-green-50 sm:px-6 sm:py-4"
-                  onClick={() => {
-                    employee.Attendance[0]?.break_out &&
-                      employee.Attendance[0]?.break_out_image &&
-                      setOpenModal({
-                        link: employee.Attendance[0]?.break_out_image,
-                        isOpen: true,
-                      });
-                  }}
-                >
-                  {employee.Attendance[0]?.break_out?.toLocaleTimeString()}
-                </td>
-                <td
-                  className="cursor-pointer px-2 py-1 hover:bg-green-50 sm:px-6 sm:py-4"
-                  onClick={() => {
-                    employee.Attendance[0]?.time_out &&
-                      employee.Attendance[0]?.time_out_image &&
-                      setOpenModal({
-                        link: employee.Attendance[0]?.time_out_image,
-                        isOpen: true,
-                      });
-                  }}
-                >
-                  {employee.Attendance[0]?.time_out?.toLocaleTimeString()}
+            {!employeesQuery.data || employeesQuery.isLoading ? (
+              <tr>
+                <td colSpan={6} className="text-center">
+                  Loading...
                 </td>
               </tr>
-            ))}
+            ) : (
+              employeesQuery.data?.map((employee) => (
+                <tr key={employee.id} className="border-b text-xs sm:text-sm">
+                  <td className="px-2 py-1 hover:bg-green-50 sm:px-6 sm:py-4">
+                    {employee.id}
+                  </td>
+                  <td className="hidden px-2 py-1 hover:bg-green-50 sm:block sm:px-6 sm:py-4">
+                    {employee.first_name + " " + employee.last_name}
+                  </td>
+                  <td
+                    className="cursor-pointer px-2 py-1 hover:bg-green-50 sm:px-6 sm:py-4"
+                    onClick={() => {
+                      employee.Attendance[0]?.time_in &&
+                        employee.Attendance[0]?.time_in_image &&
+                        setOpenModal({
+                          link: employee.Attendance[0]?.time_in_image,
+                          isOpen: true,
+                        });
+                    }}
+                  >
+                    {employee.Attendance[0]?.time_in?.toLocaleTimeString()}
+                  </td>
+                  <td
+                    className="cursor-pointer px-2 py-1 hover:bg-green-50 sm:px-6 sm:py-4"
+                    onClick={() => {
+                      employee.Attendance[0]?.break_in &&
+                        employee.Attendance[0]?.break_in_image &&
+                        setOpenModal({
+                          link: employee.Attendance[0]?.break_in_image,
+                          isOpen: true,
+                        });
+                    }}
+                  >
+                    {employee.Attendance[0]?.break_in?.toLocaleTimeString()}
+                  </td>
+                  <td
+                    className="cursor-pointer px-2 py-1 hover:bg-green-50 sm:px-6 sm:py-4"
+                    onClick={() => {
+                      employee.Attendance[0]?.break_out &&
+                        employee.Attendance[0]?.break_out_image &&
+                        setOpenModal({
+                          link: employee.Attendance[0]?.break_out_image,
+                          isOpen: true,
+                        });
+                    }}
+                  >
+                    {employee.Attendance[0]?.break_out?.toLocaleTimeString()}
+                  </td>
+                  <td
+                    className="cursor-pointer px-2 py-1 hover:bg-green-50 sm:px-6 sm:py-4"
+                    onClick={() => {
+                      employee.Attendance[0]?.time_out &&
+                        employee.Attendance[0]?.time_out_image &&
+                        setOpenModal({
+                          link: employee.Attendance[0]?.time_out_image,
+                          isOpen: true,
+                        });
+                    }}
+                  >
+                    {employee.Attendance[0]?.time_out?.toLocaleTimeString()}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
 
-        <h3>Create Employee</h3>
         <form
-          className="flex flex-col gap-4"
+          className="mx-auto flex max-w-xs flex-col gap-4"
           onSubmit={(e) => {
             e.preventDefault();
 
@@ -157,90 +165,107 @@ const HRDashboard = () => {
             })();
           }}
         >
-          <div className="flex items-center gap-x-2">
-            <label htmlFor="unique-id-number">Unique ID Number</label>
+          <h3 className="text-center text-lg font-bold">Create Employee</h3>
+          <div className="flex flex-col gap-x-2 text-left">
+            <label htmlFor="unique-id-number" className="text-sm">
+              Unique ID Number <span className="text-red-500">*</span>
+            </label>
             <input
               required
               type="text"
               id="unique-id-number"
+              className="flex-1"
               value={employee.id}
+              placeholder="e.g. 123456789"
               onChange={(e) => {
                 setEmployee({ ...employee, id: e.target.value });
               }}
             />
           </div>
-          <div className="flex items-center gap-x-2">
-            <label htmlFor="first-name">First Name</label>
-            <input
-              required
-              type="text"
-              id="first-name"
-              value={employee.first_name}
-              onChange={(e) => {
-                setEmployee({ ...employee, first_name: e.target.value });
-              }}
-            />
+          <div className="flex gap-x-2">
+            <div className="text-left">
+              <label htmlFor="first-name" className="text-sm">
+                First Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                required
+                type="text"
+                id="first-name"
+                value={employee.first_name}
+                placeholder="e.g. Juan"
+                className="w-full"
+                onChange={(e) => {
+                  setEmployee({ ...employee, first_name: e.target.value });
+                }}
+              />
+            </div>
+            <div className="text-left">
+              <label htmlFor="last-name" className="text-sm">
+                Last Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                required
+                type="text"
+                id="last-name"
+                value={employee.last_name}
+                placeholder="e.g. Dela Cruz"
+                className="w-full"
+                onChange={(e) => {
+                  setEmployee({ ...employee, last_name: e.target.value });
+                }}
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-x-2">
-            <label htmlFor="last-name">Last Name</label>
-            <input
-              required
-              type="text"
-              id="last-name"
-              value={employee.last_name}
-              onChange={(e) => {
-                setEmployee({ ...employee, last_name: e.target.value });
-              }}
-            />
-          </div>
-          <div className="flex items-center gap-x-2">
-            <label htmlFor="email">Email</label>
+
+          <div className="flex flex-col gap-x-2 text-left">
+            <label htmlFor="email" className="text-sm">
+              Email <span className="text-red-500">*</span>
+            </label>
             <input
               required
               type="email"
               id="email"
+              className="flex-1"
               value={employee.email}
+              placeholder="e.g. juan.delacruz@cvsu.edu.ph"
               onChange={(e) => {
                 setEmployee({ ...employee, email: e.target.value });
               }}
             />
           </div>
-          <div className="flex items-center gap-x-2">
-            <label htmlFor="password">Password</label>
+          <div className="flex flex-col gap-x-2 text-left">
+            <label htmlFor="password" className="text-sm">
+              Password <span className="text-red-500">*</span>
+            </label>
             <input
               required
               type="password"
               id="password"
+              className="flex-1"
               value={employee.password}
+              placeholder="********"
               onChange={(e) => {
                 setEmployee({ ...employee, password: e.target.value });
               }}
             />
           </div>
+
           <button type="submit" className="button">
             Create
           </button>
+          <div className="text-center">
+            {createEmployeeMutation.isLoading && <p>Loading...</p>}
+            {createEmployeeMutation.isError && (
+              <p className="text-red-500">
+                Error: {createEmployeeMutation.error.message}
+              </p>
+            )}
+
+            {createEmployeeMutation.isSuccess && (
+              <p className="text-green-500">Employee created successfully!</p>
+            )}
+          </div>
         </form>
-
-        {createEmployeeMutation.isLoading && <p>Loading...</p>}
-        {createEmployeeMutation.isError && (
-          <p>Error: {createEmployeeMutation.error.message}</p>
-        )}
-
-        {createEmployeeMutation.isSuccess && (
-          <p>Employee created successfully!</p>
-        )}
-
-        <h3>Employees</h3>
-        <ul>
-          {!employeesQuery.data ? (
-            <>No employees</>
-          ) : (
-            employeesQuery.data.map((employee) => (
-              <li key={employee.id}>{employee.first_name}</li>
-            ))
-          )}
-        </ul>
       </main>
     </>
   );
