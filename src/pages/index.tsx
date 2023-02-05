@@ -1,7 +1,12 @@
 import { type NextPage } from "next";
 import Link from "next/link";
+import { api } from "../utils/api";
 
 const Home: NextPage = () => {
+  const wefse = api.employee.attendance.useMutation();
+  // wefse.mutate({
+  //   type: "time_in",
+  // });
   return (
     <>
       <main>

@@ -41,13 +41,17 @@ model HR {
 
 model Attendance{
     id           String   @unique @default(cuid())
-    employee_id  String @unique
+    employee_id  String 
     employee     Employee @relation(fields: [employee_id], references: [id], onDelete: Cascade)
-    date         DateTime
+    date         DateTime 
     time_in      DateTime?
+    time_in_image String?
     time_out     DateTime?
+    time_out_image String?
     break_in     DateTime?
+    break_in_image String?
     break_out    DateTime?
+    break_out_image String?
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
 }
