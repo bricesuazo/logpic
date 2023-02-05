@@ -1,11 +1,14 @@
 import { type GetServerSidePropsContext } from "next";
 import { getServerAuthSession } from "../server/auth";
 import { api } from "../utils/api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import ImageModal from "../components/ImageModal";
+import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
+import { Menu, Transition } from "@headlessui/react";
 
 const HRDashboard = () => {
   const createEmployeeMutation = api.hr.createEmployee.useMutation();
+  const deleteEmployeeMutation = api.hr.deleteEmployee.useMutation();
   const employeesQuery = api.hr.getAllEmployeesWithAttendanceToday.useQuery();
   const [time, setTime] = useState<string | undefined>();
   const [isOpenModal, setOpenModal] = useState({ link: "", isOpen: false });
@@ -62,6 +65,7 @@ const HRDashboard = () => {
                   {thead.title}
                 </th>
               ))}
+              <th />
             </tr>
           </thead>
           <tbody className="overflow-y-visible">
@@ -131,6 +135,62 @@ const HRDashboard = () => {
                     }}
                   >
                     {employee.Attendance[0]?.time_out?.toLocaleTimeString()}
+                  </td>
+                  <td>
+                    <button className="rounded p-2 text-gray-500 hover:bg-green-200">
+                      <FaEdit />
+                    </button>
+                    <Menu as="div" className="relative inline-block text-left">
+                      {({ close }) => (
+                        <>
+                          <Menu.Button className="rounded p-2 text-gray-500 hover:bg-green-200">
+                            <FaRegTrashAlt />
+                          </Menu.Button>
+                          <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-100"
+                            enterFrom="transform opacity-0 scale-95"
+                            enterTo="transform opacity-100 scale-100"
+                            leave="transition ease-in duration-75"
+                            leaveFrom="transform opacity-100 scale-100"
+                            leaveTo="transform opacity-0 scale-95"
+                          >
+                            <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right space-y-2 rounded-md bg-white p-2 shadow-lg">
+                              <p>
+                                Are you sure you want to delete{" "}
+                                {employee.first_name + " " + employee.last_name}
+                                ?
+                              </p>
+                              <div className="flex justify-end gap-x-1">
+                                <button
+                                  className="rounded border px-3 py-1"
+                                  onClick={() => close()}
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  className="rounded border bg-red-500 px-3 py-1 text-white"
+                                  onClick={() => {
+                                    void (async () => {
+                                      await deleteEmployeeMutation.mutateAsync({
+                                        id: employee.id,
+                                      });
+                                      await employeesQuery.refetch();
+                                      close();
+                                    })();
+                                  }}
+                                  disabled={deleteEmployeeMutation.isLoading}
+                                >
+                                  {deleteEmployeeMutation.isLoading
+                                    ? "Loading"
+                                    : "Delete"}
+                                </button>
+                              </div>
+                            </Menu.Items>
+                          </Transition>
+                        </>
+                      )}
+                    </Menu>
                   </td>
                 </tr>
               ))

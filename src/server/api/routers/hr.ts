@@ -7,6 +7,20 @@ export const hrRouter = createTRPCRouter({
   getAllEmployees: hrProcedure.query(({ ctx }) => {
     return ctx.prisma.employee.findMany();
   }),
+  deleteEmployee: hrProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return ctx.prisma.employee.delete({
+        where: {
+          id: input.id,
+        },
+      });
+    }),
+
   createEmployee: hrProcedure
     .input(
       z.object({
