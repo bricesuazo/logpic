@@ -7,8 +7,12 @@ const Home: NextPage = () => {
     <>
       <main>
         <div className="flex gap-x-2">
-          <Link href="/hr-login">HR</Link>
-          <Link href="/employee-login">Employee</Link>
+          <Link href="/hr-login" className="button border p-4">
+            HR
+          </Link>
+          <Link href="/employee-login" className="button border p-4">
+            Employee
+          </Link>
         </div>
       </main>
     </>

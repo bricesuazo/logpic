@@ -67,7 +67,8 @@ const EmployeeDashboard = () => {
                   className="button"
                   disabled={
                     !attendanceQuery.data.time_in ||
-                    !!attendanceQuery.data.break_out
+                    !!attendanceQuery.data.break_out ||
+                    !!attendanceQuery.data.time_out
                   }
                   onClick={() => {
                     void (async () => {
