@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+input {
+  @apply rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none;
+}
+.button {
+  @apply rounded-lg bg-green-700 px-3 py-2 text-white focus:outline-none;
+}

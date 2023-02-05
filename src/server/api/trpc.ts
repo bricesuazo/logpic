@@ -119,11 +119,7 @@ const enforceEmployeeIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 const enforceHRIsAuthed = t.middleware(({ ctx, next }) => {
-  if (
-    !ctx.session ||
-    !ctx.session.user ||
-    ctx.session.user.role !== "EMPLOYEE"
-  ) {
+  if (!ctx.session || !ctx.session.user || ctx.session.user.role !== "HR") {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({

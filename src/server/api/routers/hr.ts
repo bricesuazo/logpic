@@ -1,8 +1,12 @@
+import bcrypt from "bcryptjs";
 import { z } from "zod";
 
 import { createTRPCRouter, hrProcedure } from "../trpc";
 
 export const hrRouter = createTRPCRouter({
+  getAllEmployees: hrProcedure.query(({ ctx }) => {
+    return ctx.prisma.employee.findMany();
+  }),
   createEmployee: hrProcedure
     .input(
       z.object({
@@ -13,14 +17,14 @@ export const hrRouter = createTRPCRouter({
         password: z.string(),
       })
     )
-    .mutation(({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
       return ctx.prisma.employee.create({
         data: {
           id: input.id,
           email: input.email,
           first_name: input.first_name,
           last_name: input.last_name,
-          password: input.password,
+          password: await bcrypt.hash(input.password, 12),
         },
       });
     }),
