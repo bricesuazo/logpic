@@ -123,7 +123,7 @@ export const authOptions: NextAuthOptions = {
 
         if (credentials.type === "HR") {
           const hr = await prisma.hR.findUnique({
-            where: { id: credentials.id },
+            where: { email: credentials.id },
           });
           if (!hr) {
             throw new Error("No user found");

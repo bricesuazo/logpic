@@ -5,10 +5,10 @@ import { type GetServerSidePropsContext } from "next";
 
 const HRLogin = () => {
   const [employeeLogin, setEmployeeLogin] = useState<{
-    uniqueNumber: string;
+    email: string;
     password: string;
   }>({
-    uniqueNumber: "",
+    email: "",
     password: "",
   });
 
@@ -23,22 +23,22 @@ const HRLogin = () => {
           void (async () => {
             await signIn("credentials", {
               type: "HR",
-              id: employeeLogin.uniqueNumber,
+              id: employeeLogin.email,
               password: employeeLogin.password,
               callbackUrl: "/hr-dashboard",
             });
           })();
         }}
       >
-        <label htmlFor="unique-number">Unique Number</label>
+        <label htmlFor="email">Email</label>
         <input
-          type="text"
-          id="unique-number"
+          type="email"
+          id="email"
           required
           onChange={(e) => {
             setEmployeeLogin({
               ...employeeLogin,
-              uniqueNumber: e.target.value,
+              email: e.target.value,
             });
           }}
         />

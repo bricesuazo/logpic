@@ -15,9 +15,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <>
       <Head>
-        <title>LogPic</title>
-        <meta name="description" content="LogPic" />
-        {/* <link rel="icon" href="/favicon.ico" /> */}
+        <title>LogPic - Digital Daily Time Record</title>
+        <meta name="description" content="LogPic - Digital Daily Time Record" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <SessionProvider session={session}>
         <Header />

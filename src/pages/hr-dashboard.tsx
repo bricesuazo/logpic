@@ -2,7 +2,6 @@ import { type GetServerSidePropsContext } from "next";
 import { getServerAuthSession } from "../server/auth";
 import { api } from "../utils/api";
 import { useState, useEffect } from "react";
-import Moment from "react-moment";
 import ImageModal from "../components/ImageModal";
 
 const HRDashboard = () => {
@@ -250,8 +249,12 @@ const HRDashboard = () => {
             />
           </div>
 
-          <button type="submit" className="button">
-            Create
+          <button
+            type="submit"
+            className="button"
+            disabled={createEmployeeMutation.isLoading}
+          >
+            {createEmployeeMutation.isLoading ? "Loading..." : "Create"}
           </button>
           <div className="text-center">
             {createEmployeeMutation.isLoading && <p>Loading...</p>}
