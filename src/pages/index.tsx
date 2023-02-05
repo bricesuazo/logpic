@@ -5,7 +5,7 @@ import { api } from "../utils/api";
 const Home: NextPage = () => {
   return (
     <>
-      <main>main</main>
+      <main></main>
     </>
   );
 };

@@ -15,13 +15,12 @@ datasource db {
 }
 
 model Employee {
-    id           BigInt   @unique
+    id           String   @unique
     password     String
     first_name         String
     last_name         String
-    email        String?   @unique
-    role         String @default("EMPLOYEE")
-    image        String
+    email        String   @unique
+    image        String?
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
 
@@ -29,13 +28,11 @@ model Employee {
 }
 
 model HR {
-    id           BigInt   @unique
+    id           String   @unique
     email        String   @unique
     first_name   String
     last_name    String
     password     String
-    name         String
-    role         String @default("HR")
     image        String?
 
     createdAt    DateTime @default(now())
@@ -43,14 +40,14 @@ model HR {
 }
 
 model Attendance{
-    id           BigInt   @unique
-    employee_id  BigInt @unique
+    id           String   @unique @default(cuid())
+    employee_id  String @unique
     employee     Employee @relation(fields: [employee_id], references: [id], onDelete: Cascade)
     date         DateTime
-    time_in      DateTime
-    time_out     DateTime
-    break_in     DateTime
-    break_out    DateTime
+    time_in      DateTime?
+    time_out     DateTime?
+    break_in     DateTime?
+    break_out    DateTime?
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
 }
