@@ -1,6 +1,8 @@
 import { z } from "zod";
 
 import { createTRPCRouter, employeeProcedure } from "../trpc";
+import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import { storage } from "../../../utils/firebase";
 
 export const employeeRouter = createTRPCRouter({
   getAttendanceOrCreate: employeeProcedure.query(async ({ ctx }) => {
@@ -26,52 +28,75 @@ export const employeeRouter = createTRPCRouter({
     .input(
       z.object({
         type: z.enum(["TIME_IN", "BREAK_IN", "BREAK_OUT", "TIME_OUT"]),
-        imageUrl: z.string(),
-        id: z.string(),
+        imageBase64: z.string(),
+        attendanceId: z.string(),
       })
     )
-    .mutation(({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
       switch (input.type) {
         case "TIME_IN":
-          return ctx.prisma.attendance.update({
-            where: {
-              id: input.id,
-            },
-            data: {
-              employee_id: ctx.session.user.id,
-              date: new Date().toLocaleDateString(),
-              time_in: new Date(),
-              time_in_image: input.imageUrl,
-            },
+          const imageRef = ref(
+            storage,
+            "attendance/" +
+              new Date().getFullYear().toString() +
+              "-" +
+              (new Date().getMonth() + 1).toString() +
+              "-" +
+              new Date().getUTCDate().toString() +
+              "/" +
+              ctx.session.user.id +
+              "/time_in/" +
+              new Date().getTime().toString()
+          );
+
+          return await uploadString(
+            imageRef,
+            input.imageBase64,
+            "data_url"
+          ).then(async (snapshot) => {
+            await getDownloadURL(snapshot.ref).then(async (url) => {
+              await ctx.prisma.attendance.update({
+                where: {
+                  id: input.attendanceId,
+                },
+                data: {
+                  employee_id: ctx.session.user.id,
+                  date: new Date().toLocaleDateString(),
+                  time_in: new Date(),
+                  time_in_image: url,
+                },
+              });
+            });
           });
+
         case "BREAK_IN":
           return ctx.prisma.attendance.update({
             where: {
-              id: input.id,
+              id: ctx.session.user.id,
             },
             data: {
               break_in: new Date(),
-              break_in_image: input.imageUrl,
+              break_in_image: input.imageBase64,
             },
           });
         case "BREAK_OUT":
           return ctx.prisma.attendance.update({
             where: {
-              id: input.id,
+              id: ctx.session.user.id,
             },
             data: {
               break_out: new Date(),
-              break_out_image: input.imageUrl,
+              break_out_image: input.imageBase64,
             },
           });
         case "TIME_OUT":
           return ctx.prisma.attendance.update({
             where: {
-              id: input.id,
+              id: ctx.session.user.id,
             },
             data: {
               time_out: new Date(),
-              time_out_image: input.imageUrl,
+              time_out_image: input.imageBase64,
             },
           });
       }

@@ -2,11 +2,18 @@ import { type GetServerSidePropsContext } from "next";
 import { getServerAuthSession } from "../server/auth";
 import { useEffect, useState } from "react";
 import { api } from "../utils/api";
+import Image from "next/image";
 
 const EmployeeDashboard = () => {
   const [time, setTime] = useState<string | undefined>();
   const attendanceQuery = api.employee.getAttendanceOrCreate.useQuery();
   const attendanceMutation = api.employee.attendance.useMutation();
+  const [images, setImages] = useState<{
+    timeIn?: File;
+    breakIn?: File;
+    breakOut?: File;
+    timeOut?: File;
+  }>();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -19,13 +26,28 @@ const EmployeeDashboard = () => {
   return (
     <div>
       <h1>Employee Dashboard</h1>
-      {!attendanceQuery.data ? (
-        <>No attendance</>
-      ) : attendanceQuery.isLoading ? (
+
+      {!attendanceQuery.data || attendanceQuery.isLoading ? (
         <>Loading...</>
       ) : (
         <div className="grid grid-cols-4">
-          <div className="col-span-1">
+          <form
+            className="col-span-1"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!images?.timeIn) return;
+
+              const reader = new FileReader();
+              reader.readAsDataURL(images.timeIn);
+              reader.onload = async () => {
+                await attendanceMutation.mutateAsync({
+                  type: "TIME_IN",
+                  imageBase64: reader.result as string,
+                  attendanceId: attendanceQuery.data.id,
+                });
+              };
+            }}
+          >
             <h2>Time In:</h2>
             <p>{new Date().toLocaleDateString()}</p>
 
@@ -34,27 +56,45 @@ const EmployeeDashboard = () => {
             ) : (
               <div className="">
                 <p>{time ? time : "Loading..."}</p>
+                <label htmlFor="time-in-image">Time In Image</label>
+                <input
+                  type="file"
+                  name=""
+                  id="time-in-image"
+                  required
+                  onChange={(e) =>
+                    e.target.files && setImages({ timeIn: e.target.files[0] })
+                  }
+                />
                 <button
+                  type="submit"
                   className="button"
-                  onClick={() => {
-                    void (async () => {
-                      await attendanceMutation.mutateAsync({
-                        id: attendanceQuery.data.id,
-                        type: "TIME_IN",
-                        imageUrl: "https://picsum.photos/200",
-                      });
+                  disabled={attendanceMutation.isLoading}
+                  // onClick={() => {
+                  //   void (async () => {
+                  //     await attendanceMutation.mutateAsync({
+                  //       id: attendanceQuery.data.id,
+                  //       type: "TIME_IN",
+                  //       imageBase64: "https://picsum.photos/200",
+                  //     });
 
-                      setTime(new Date().toLocaleTimeString());
+                  //     setTime(new Date().toLocaleTimeString());
 
-                      await attendanceQuery.refetch();
-                    })();
-                  }}
+                  //     await attendanceQuery.refetch();
+                  //   })();
+                  // }}
                 >
                   {attendanceMutation.isLoading ? "Loading..." : "Time In"}
                 </button>
               </div>
             )}
-          </div>
+
+            <div className="relative aspect-square w-28 object-cover">
+              {attendanceQuery.data.time_in_image && (
+                <Image src={attendanceQuery.data.time_in_image} alt="" fill />
+              )}
+            </div>
+          </form>
           <div className="col-span-1">
             <h2>Break In:</h2>
             <p>{new Date().toLocaleDateString()}</p>
@@ -74,8 +114,8 @@ const EmployeeDashboard = () => {
                     void (async () => {
                       await attendanceMutation.mutateAsync({
                         type: "BREAK_IN",
-                        imageUrl: "https://picsum.photos/200",
-                        id: attendanceQuery.data?.id,
+                        imageBase64: "https://picsum.photos/200",
+                        attendanceId: attendanceQuery.data.id,
                       });
 
                       setTime(new Date().toLocaleTimeString());
@@ -88,6 +128,11 @@ const EmployeeDashboard = () => {
                 </button>
               </div>
             )}
+            <div className="relative aspect-square w-28 object-cover">
+              {attendanceQuery.data.break_in_image && (
+                <Image src={attendanceQuery.data.break_in_image} alt="" fill />
+              )}
+            </div>
           </div>
           <div className="col-span-1">
             <h2>Break Out:</h2>
@@ -108,8 +153,8 @@ const EmployeeDashboard = () => {
                     void (async () => {
                       await attendanceMutation.mutateAsync({
                         type: "BREAK_OUT",
-                        imageUrl: "https://picsum.photos/200",
-                        id: attendanceQuery.data?.id,
+                        imageBase64: "https://picsum.photos/200",
+                        attendanceId: attendanceQuery.data.id,
                       });
 
                       setTime(new Date().toLocaleTimeString());
@@ -122,6 +167,11 @@ const EmployeeDashboard = () => {
                 </button>
               </div>
             )}
+            <div className="relative aspect-square w-28 object-cover">
+              {attendanceQuery.data.break_out_image && (
+                <Image src={attendanceQuery.data.break_out_image} alt="" fill />
+              )}
+            </div>
           </div>
           <div className="col-span-1">
             <h2>Time Out:</h2>
@@ -138,8 +188,8 @@ const EmployeeDashboard = () => {
                     void (async () => {
                       await attendanceMutation.mutateAsync({
                         type: "TIME_OUT",
-                        imageUrl: "https://picsum.photos/200",
-                        id: attendanceQuery.data?.id,
+                        imageBase64: "https://picsum.photos/200",
+                        attendanceId: attendanceQuery.data.id,
                       });
 
                       setTime(new Date().toLocaleTimeString());
@@ -152,6 +202,11 @@ const EmployeeDashboard = () => {
                 </button>
               </div>
             )}
+            <div className="relative aspect-square w-28 object-cover">
+              {attendanceQuery.data.time_out_image && (
+                <Image src={attendanceQuery.data.time_out_image} alt="" fill />
+              )}
+            </div>
           </div>
         </div>
       )}

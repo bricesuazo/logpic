@@ -19,6 +19,12 @@ export const serverSchema = z.object({
     // VERCEL_URL doesn't include `https` so it cant be validated as a URL
     process.env.VERCEL ? z.string() : z.string().url()
   ),
+  FIREBASE_API_KEY: z.string(),
+  FIREBASE_AUTH_DOMAIN: z.string(),
+  FIREBASE_PROJECT_ID: z.string(),
+  FIREBASE_STORAGE_BUCKET: z.string(),
+  FIREBASE_MESSAGING_SENDER_ID: z.string(),
+  FIREBASE_APP_ID: z.string(),
 });
 
 /**
@@ -31,6 +37,13 @@ export const serverEnv = {
   NODE_ENV: process.env.NODE_ENV,
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+
+  FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
+  FIREBASE_AUTH_DOMAIN: process.env.FIREBASE_AUTH_DOMAIN,
+  FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID,
+  FIREBASE_STORAGE_BUCKET: process.env.FIREBASE_STORAGE_BUCKET,
+  FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
 };
 
 /**
