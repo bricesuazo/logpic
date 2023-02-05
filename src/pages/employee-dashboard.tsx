@@ -5,7 +5,7 @@ import { api } from "../utils/api";
 
 const EmployeeDashboard = () => {
   const [time, setTime] = useState<string | undefined>();
-  const attendanceQuery = api.employee.getAttendance.useQuery();
+  const attendanceQuery = api.employee.getAttendanceOrCreate.useQuery();
   const attendanceMutation = api.employee.attendance.useMutation();
 
   useEffect(() => {
@@ -35,9 +35,11 @@ const EmployeeDashboard = () => {
               <div className="">
                 <p>{time ? time : "Loading..."}</p>
                 <button
+                  className="button"
                   onClick={() => {
                     void (async () => {
                       await attendanceMutation.mutateAsync({
+                        id: attendanceQuery.data.id,
                         type: "TIME_IN",
                         imageUrl: "https://picsum.photos/200",
                       });
@@ -62,6 +64,11 @@ const EmployeeDashboard = () => {
               <div className="">
                 <p>{time ? time : "Loading..."}</p>
                 <button
+                  className="button"
+                  disabled={
+                    !attendanceQuery.data.time_in ||
+                    !!attendanceQuery.data.break_out
+                  }
                   onClick={() => {
                     void (async () => {
                       await attendanceMutation.mutateAsync({
@@ -90,6 +97,12 @@ const EmployeeDashboard = () => {
               <div className="">
                 <p>{time ? time : "Loading..."}</p>
                 <button
+                  className="button"
+                  disabled={
+                    !attendanceQuery.data.break_in ||
+                    !attendanceQuery.data.time_in ||
+                    !!attendanceQuery.data.break_out
+                  }
                   onClick={() => {
                     void (async () => {
                       await attendanceMutation.mutateAsync({
@@ -118,6 +131,8 @@ const EmployeeDashboard = () => {
               <div className="">
                 <p>{time ? time : "Loading..."}</p>
                 <button
+                  className="button"
+                  disabled={!attendanceQuery.data?.time_in}
                   onClick={() => {
                     void (async () => {
                       await attendanceMutation.mutateAsync({
