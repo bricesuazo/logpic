@@ -30,10 +30,15 @@ const EmployeeDashboard = () => {
 
   return (
     <main className="mx-auto max-w-screen-lg space-y-4 p-4 text-center">
-      <h1 className="text-xl font-bold">Employee Dashboard</h1>
+      <div className="space-y-1">
+        <h1 className="text-2xl font-bold">Employee Dashboard</h1>
+        <p className="font-bold">
+          <Moment format="dddd, MMMM Do YYYY">{new Date()}</Moment>
+        </p>
+      </div>
 
       {!attendanceQuery.data || attendanceQuery.isLoading ? (
-        <>Loading...</>
+        <p>Loading...</p>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
           <form
@@ -56,50 +61,51 @@ const EmployeeDashboard = () => {
               };
             }}
           >
-            <h2 className="text-lg font-bold">Time In:</h2>
-            <p>
-              <Moment format="dddd, MMMM Do YYYY">{new Date()}</Moment>
-            </p>
+            <div>
+              <h2 className="text-lg font-bold">Time In:</h2>
 
-            {attendanceQuery.data.time_in ? (
-              <p>{attendanceQuery.data.time_in.toLocaleTimeString()}</p>
-            ) : (
-              <div className="space-y-4">
-                <p>{time ? time : "Loading..."}</p>
-                <input
-                  type="file"
-                  required
-                  hidden
-                  accept="image/*"
-                  onChange={(e) => {
-                    e.target.files && setImages({ timeIn: e.target.files[0] });
-                    e.target.value = "";
-                  }}
-                  ref={timeInUploadRef}
-                />
-                <div className="flex flex-col justify-center gap-y-1">
-                  <button
-                    type="submit"
-                    className="button"
-                    disabled={attendanceMutation.isLoading || !images?.timeIn}
-                  >
-                    {attendanceMutation.isLoading ? "Loading..." : "Time In"}
-                  </button>
-
-                  <button
-                    type="button"
-                    className="button text-sm"
-                    onClick={() => {
-                      !images?.timeIn
-                        ? timeInUploadRef.current?.click()
-                        : setImages({ ...images, timeIn: undefined });
+              {attendanceQuery.data.time_in ? (
+                <p>{attendanceQuery.data.time_in.toLocaleTimeString()}</p>
+              ) : (
+                <div className="space-y-4">
+                  <p>{time ? time : "Loading..."}</p>
+                  <input
+                    type="file"
+                    required
+                    hidden
+                    accept="image/*"
+                    onChange={(e) => {
+                      e.target.files &&
+                        setImages({ timeIn: e.target.files[0] });
+                      e.target.value = "";
                     }}
-                  >
-                    {!images?.timeIn ? "Upload Image" : "Clear"}
-                  </button>
+                    ref={timeInUploadRef}
+                  />
+                  <div className="flex flex-col justify-center gap-y-1">
+                    <button
+                      type="submit"
+                      className="button"
+                      disabled={attendanceMutation.isLoading || !images?.timeIn}
+                    >
+                      {attendanceMutation.isLoading ? "Loading..." : "Time In"}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="button text-sm"
+                      onClick={() => {
+                        !images?.timeIn
+                          ? timeInUploadRef.current?.click()
+                          : setImages({ ...images, timeIn: undefined });
+                      }}
+                    >
+                      {!images?.timeIn ? "Upload Image" : "Clear"}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+
             {images?.timeIn && (
               <div className="relative aspect-square w-full">
                 <Image
@@ -147,55 +153,57 @@ const EmployeeDashboard = () => {
               };
             }}
           >
-            <h2 className="text-lg font-bold">Break In:</h2>
-            <p>
-              <Moment format="dddd, MMMM Do YYYY">{new Date()}</Moment>
-            </p>
+            <div>
+              <h2 className="text-lg font-bold">Break In:</h2>
 
-            {attendanceQuery.data.break_in ? (
-              <p>{attendanceQuery.data.break_in.toLocaleTimeString()}</p>
-            ) : (
-              <div className="space-y-4">
-                <p>{time ? time : "Loading..."}</p>
-                <input
-                  type="file"
-                  required
-                  hidden
-                  accept="image/*"
-                  onChange={(e) => {
-                    e.target.files && setImages({ breakIn: e.target.files[0] });
-                    e.target.value = "";
-                  }}
-                  ref={breakInUploadRef}
-                />
-                <div className="flex flex-col justify-center gap-y-1">
-                  <button
-                    type="submit"
-                    className="button"
-                    disabled={attendanceMutation.isLoading || !images?.breakIn}
-                  >
-                    {attendanceMutation.isLoading ? "Loading..." : "Break In"}
-                  </button>
-
-                  <button
-                    type="button"
-                    className="button text-sm"
-                    disabled={
-                      attendanceMutation.isLoading ||
-                      !attendanceQuery.data.time_in ||
-                      !!attendanceQuery.data.time_out
-                    }
-                    onClick={() => {
-                      !images?.breakIn
-                        ? breakInUploadRef.current?.click()
-                        : setImages({ ...images, breakIn: undefined });
+              {attendanceQuery.data.break_in ? (
+                <p>{attendanceQuery.data.break_in.toLocaleTimeString()}</p>
+              ) : (
+                <div className="space-y-4">
+                  <p>{time ? time : "Loading..."}</p>
+                  <input
+                    type="file"
+                    required
+                    hidden
+                    accept="image/*"
+                    onChange={(e) => {
+                      e.target.files &&
+                        setImages({ breakIn: e.target.files[0] });
+                      e.target.value = "";
                     }}
-                  >
-                    {!images?.breakIn ? "Upload Image" : "Clear"}
-                  </button>
+                    ref={breakInUploadRef}
+                  />
+                  <div className="flex flex-col justify-center gap-y-1">
+                    <button
+                      type="submit"
+                      className="button"
+                      disabled={
+                        attendanceMutation.isLoading || !images?.breakIn
+                      }
+                    >
+                      {attendanceMutation.isLoading ? "Loading..." : "Break In"}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="button text-sm"
+                      disabled={
+                        attendanceMutation.isLoading ||
+                        !attendanceQuery.data.time_in ||
+                        !!attendanceQuery.data.time_out
+                      }
+                      onClick={() => {
+                        !images?.breakIn
+                          ? breakInUploadRef.current?.click()
+                          : setImages({ ...images, breakIn: undefined });
+                      }}
+                    >
+                      {!images?.breakIn ? "Upload Image" : "Clear"}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
             {images?.breakIn && (
               <div className="relative aspect-square w-full">
                 <Image
@@ -243,56 +251,59 @@ const EmployeeDashboard = () => {
               };
             }}
           >
-            <h2 className="text-lg font-bold">Break Out:</h2>
-            <p>
-              <Moment format="dddd, MMMM Do YYYY">{new Date()}</Moment>
-            </p>
+            <div>
+              <h2 className="text-lg font-bold">Break Out:</h2>
 
-            {attendanceQuery.data.break_out ? (
-              <p>{attendanceQuery.data.break_out.toLocaleTimeString()}</p>
-            ) : (
-              <div className="space-y-4">
-                <p>{time ? time : "Loading..."}</p>
-                <input
-                  type="file"
-                  required
-                  hidden
-                  accept="image/*"
-                  onChange={(e) => {
-                    e.target.files &&
-                      setImages({ breakOut: e.target.files[0] });
-                    e.target.value = "";
-                  }}
-                  ref={breakOutUploadRef}
-                />
-                <div className="flex flex-col justify-center gap-y-1">
-                  <button
-                    type="submit"
-                    className="button"
-                    disabled={attendanceMutation.isLoading || !images?.breakOut}
-                  >
-                    {attendanceMutation.isLoading ? "Loading..." : "Break Out"}
-                  </button>
-
-                  <button
-                    type="button"
-                    className="button text-sm"
-                    disabled={
-                      attendanceMutation.isLoading ||
-                      !attendanceQuery.data.break_in ||
-                      !!attendanceQuery.data.time_out
-                    }
-                    onClick={() => {
-                      !images?.breakOut
-                        ? breakOutUploadRef.current?.click()
-                        : setImages({ ...images, breakOut: undefined });
+              {attendanceQuery.data.break_out ? (
+                <p>{attendanceQuery.data.break_out.toLocaleTimeString()}</p>
+              ) : (
+                <div className="space-y-4">
+                  <p>{time ? time : "Loading..."}</p>
+                  <input
+                    type="file"
+                    required
+                    hidden
+                    accept="image/*"
+                    onChange={(e) => {
+                      e.target.files &&
+                        setImages({ breakOut: e.target.files[0] });
+                      e.target.value = "";
                     }}
-                  >
-                    {!images?.breakOut ? "Upload Image" : "Clear"}
-                  </button>
+                    ref={breakOutUploadRef}
+                  />
+                  <div className="flex flex-col justify-center gap-y-1">
+                    <button
+                      type="submit"
+                      className="button"
+                      disabled={
+                        attendanceMutation.isLoading || !images?.breakOut
+                      }
+                    >
+                      {attendanceMutation.isLoading
+                        ? "Loading..."
+                        : "Break Out"}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="button text-sm"
+                      disabled={
+                        attendanceMutation.isLoading ||
+                        !attendanceQuery.data.break_in ||
+                        !!attendanceQuery.data.time_out
+                      }
+                      onClick={() => {
+                        !images?.breakOut
+                          ? breakOutUploadRef.current?.click()
+                          : setImages({ ...images, breakOut: undefined });
+                      }}
+                    >
+                      {!images?.breakOut ? "Upload Image" : "Clear"}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
             {images?.breakOut && (
               <div className="relative aspect-square w-full">
                 <Image
@@ -340,54 +351,56 @@ const EmployeeDashboard = () => {
               };
             }}
           >
-            <h2 className="text-lg font-bold">Time Out:</h2>
-            <p>
-              <Moment format="dddd, MMMM Do YYYY">{new Date()}</Moment>
-            </p>
+            <div>
+              <h2 className="text-lg font-bold">Time Out:</h2>
 
-            {attendanceQuery.data.time_out ? (
-              <p>{attendanceQuery.data.time_out.toLocaleTimeString()}</p>
-            ) : (
-              <div className="space-y-4">
-                <p>{time ? time : "Loading..."}</p>
-                <input
-                  type="file"
-                  required
-                  hidden
-                  accept="image/*"
-                  onChange={(e) => {
-                    e.target.files && setImages({ timeOut: e.target.files[0] });
-                    e.target.value = "";
-                  }}
-                  ref={timeOutUploadRef}
-                />
-                <div className="flex flex-col justify-center gap-y-1">
-                  <button
-                    type="submit"
-                    className="button"
-                    disabled={attendanceMutation.isLoading || !images?.timeOut}
-                  >
-                    {attendanceMutation.isLoading ? "Loading..." : "Time Out"}
-                  </button>
-
-                  <button
-                    type="button"
-                    className="button text-sm"
-                    disabled={
-                      attendanceMutation.isLoading ||
-                      !attendanceQuery.data.time_in
-                    }
-                    onClick={() => {
-                      !images?.timeOut
-                        ? timeOutUploadRef.current?.click()
-                        : setImages({ ...images, timeOut: undefined });
+              {attendanceQuery.data.time_out ? (
+                <p>{attendanceQuery.data.time_out.toLocaleTimeString()}</p>
+              ) : (
+                <div className="space-y-4">
+                  <p>{time ? time : "Loading..."}</p>
+                  <input
+                    type="file"
+                    required
+                    hidden
+                    accept="image/*"
+                    onChange={(e) => {
+                      e.target.files &&
+                        setImages({ timeOut: e.target.files[0] });
+                      e.target.value = "";
                     }}
-                  >
-                    {!images?.timeOut ? "Upload Image" : "Clear"}
-                  </button>
+                    ref={timeOutUploadRef}
+                  />
+                  <div className="flex flex-col justify-center gap-y-1">
+                    <button
+                      type="submit"
+                      className="button"
+                      disabled={
+                        attendanceMutation.isLoading || !images?.timeOut
+                      }
+                    >
+                      {attendanceMutation.isLoading ? "Loading..." : "Time Out"}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="button text-sm"
+                      disabled={
+                        attendanceMutation.isLoading ||
+                        !attendanceQuery.data.time_in
+                      }
+                      onClick={() => {
+                        !images?.timeOut
+                          ? timeOutUploadRef.current?.click()
+                          : setImages({ ...images, timeOut: undefined });
+                      }}
+                    >
+                      {!images?.timeOut ? "Upload Image" : "Clear"}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
             {images?.timeOut && (
               <div className="relative aspect-square w-full">
                 <Image

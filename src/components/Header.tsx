@@ -16,7 +16,7 @@ const Header = () => {
             className="rounded bg-green-600 p-2"
             onClick={() =>
               void (async () => {
-                await signOut();
+                await signOut({ callbackUrl: "/" });
               })()
             }
           >
