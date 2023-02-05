@@ -6,11 +6,13 @@ import Head from "next/head";
 import { api } from "../utils/api";
 
 import "../styles/globals.css";
+import Header from "../components/Header";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
+  console.log("🚀 ~ file: _app.tsx:15 ~ session", session);
   return (
     <>
       <Head>
@@ -19,6 +21,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         {/* <link rel="icon" href="/favicon.ico" /> */}
       </Head>
       <SessionProvider session={session}>
+        <Header />
         <Component {...pageProps} />
       </SessionProvider>
     </>
