@@ -5,12 +5,18 @@ import { useState, useEffect, Fragment } from "react";
 import ImageModal from "../components/ImageModal";
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
 import { Menu, Transition } from "@headlessui/react";
+import { type Employee } from "@prisma/client";
+import EditEmployeeModal from "../components/EditEmployeeModal";
 
 const HRDashboard = () => {
   const createEmployeeMutation = api.hr.createEmployee.useMutation();
   const deleteEmployeeMutation = api.hr.deleteEmployee.useMutation();
   const employeesQuery = api.hr.getAllEmployeesWithAttendanceToday.useQuery();
   const [time, setTime] = useState<string | undefined>();
+
+  const [editCandidateModal, setEditCandidateModal] = useState(false);
+  const [employeeState, setEmployeeState] = useState({} as Employee);
+
   const [isOpenModal, setOpenModal] = useState({ link: "", isOpen: false });
   useEffect(() => {
     const interval = setInterval(() => {
@@ -27,8 +33,19 @@ const HRDashboard = () => {
     last_name: "",
     password: "",
   });
+
   return (
     <>
+      <EditEmployeeModal
+        refetch={() => {
+          void (async () => {
+            await employeesQuery.refetch();
+          })();
+        }}
+        employee={employeeState}
+        isOpen={editCandidateModal}
+        setIsOpen={() => setEditCandidateModal(false)}
+      />
       <ImageModal
         isOpen={isOpenModal.isOpen}
         link={isOpenModal.link}
@@ -137,7 +154,13 @@ const HRDashboard = () => {
                     {employee.Attendance[0]?.time_out?.toLocaleTimeString()}
                   </td>
                   <td>
-                    <button className="rounded p-2 text-gray-500 hover:bg-green-200">
+                    <button
+                      className="rounded p-2 text-gray-500 hover:bg-green-200"
+                      onClick={() => {
+                        setEditCandidateModal(true);
+                        setEmployeeState(employee);
+                      }}
+                    >
                       <FaEdit />
                     </button>
                     <Menu as="div" className="relative inline-block text-left">
@@ -231,7 +254,7 @@ const HRDashboard = () => {
             </label>
             <input
               required
-              type="text"
+              type="number"
               id="unique-id-number"
               className="flex-1"
               value={employee.id}
