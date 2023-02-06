@@ -14,10 +14,22 @@ export const hrRouter = createTRPCRouter({
         email: z.string().email(),
         first_name: z.string(),
         last_name: z.string(),
-        password: z.string(),
+        password: z.string().nullish(),
       })
     )
     .mutation(async ({ input, ctx }) => {
+      if (!input.password)
+        return ctx.prisma.employee.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            email: input.email,
+            first_name: input.first_name,
+            last_name: input.last_name,
+          },
+        });
+
       return ctx.prisma.employee.update({
         where: {
           id: input.id,

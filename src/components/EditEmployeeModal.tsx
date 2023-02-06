@@ -16,9 +16,11 @@ const EditEmployeeModal = ({
 }) => {
   const editEmployeeMutation = api.hr.updateEmployee.useMutation();
   const [employeeState, setEmployeeState] = useState<Employee>();
+  const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
     setEmployeeState(employee);
+    setNewPassword("");
   }, [employee]);
 
   if (!employeeState) return null;
@@ -65,7 +67,8 @@ const EditEmployeeModal = ({
                       employee.email === employeeState.email &&
                       employee.first_name === employeeState.first_name &&
                       employee.last_name === employeeState.last_name &&
-                      employee.password === employeeState.password
+                      employee.password === employeeState.password &&
+                      newPassword === ""
                     ) {
                       return;
                     }
@@ -76,7 +79,7 @@ const EditEmployeeModal = ({
                         email: employeeState.email,
                         first_name: employeeState.first_name,
                         last_name: employeeState.last_name,
-                        password: employeeState.password,
+                        password: newPassword === "" ? undefined : newPassword,
                       });
 
                       refetch();
@@ -169,20 +172,16 @@ const EditEmployeeModal = ({
                   </div>
                   <div className="flex flex-col gap-x-2 text-left">
                     <label htmlFor="edit-password" className="text-sm">
-                      Password <span className="text-red-500">*</span>
+                      New Password <span className="text-red-500">*</span>
                     </label>
                     <input
-                      required
                       type="password"
                       id="edit-password"
                       className="flex-1"
-                      value={employeeState.password}
+                      value={newPassword}
                       placeholder="********"
                       onChange={(e) => {
-                        setEmployeeState({
-                          ...employeeState,
-                          password: e.target.value,
-                        });
+                        setNewPassword(e.target.value);
                       }}
                     />
                   </div>
@@ -196,7 +195,7 @@ const EditEmployeeModal = ({
                         employee.email === employeeState.email &&
                         employee.first_name === employeeState.first_name &&
                         employee.last_name === employeeState.last_name &&
-                        employee.password === employeeState.password)
+                        newPassword === "")
                     }
                   >
                     {editEmployeeMutation.isLoading ? "Loading..." : "Edit"}
