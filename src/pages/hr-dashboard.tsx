@@ -67,21 +67,25 @@ const HRDashboard = () => {
               {[
                 { id: 0, title: "ID" },
                 { id: 1, title: "Name" },
-                { id: 2, title: "Time In" },
-                { id: 3, title: "Break In" },
-                { id: 4, title: "Break Out" },
-                { id: 5, title: "Time Out" },
-              ].map((thead) => (
-                <th
-                  key={thead.id}
-                  scope="col"
-                  className={`px-2 py-1 sm:px-6 sm:py-4 ${
-                    thead.id === 1 ? "hidden sm:block" : ""
-                  }`}
-                >
-                  {thead.title}
-                </th>
-              ))}
+                { id: 2, title: "Morning In" },
+                { id: 3, title: "Morning Out" },
+                { id: 4, title: "Afternoon In" },
+                { id: 5, title: "Afternoon Out" },
+              ]
+                .sort(
+                  (a, b) => (a.id === 0 ? 1 : a.id) - (b.id === 0 ? 1 : b.id)
+                )
+                .map((thead) => (
+                  <th
+                    key={thead.id}
+                    scope="col"
+                    className={`px-2 py-1 sm:px-6 sm:py-4 ${
+                      thead.id === 1 ? "hidden sm:block" : ""
+                    }`}
+                  >
+                    {thead.title}
+                  </th>
+                ))}
               <th />
             </tr>
           </thead>
@@ -117,6 +121,19 @@ const HRDashboard = () => {
                   <td
                     className="cursor-pointer px-2 py-1 hover:bg-green-50 sm:px-6 sm:py-4"
                     onClick={() => {
+                      employee.Attendance[0]?.time_out &&
+                        employee.Attendance[0]?.time_out_image &&
+                        setOpenModal({
+                          link: employee.Attendance[0]?.time_out_image,
+                          isOpen: true,
+                        });
+                    }}
+                  >
+                    {employee.Attendance[0]?.time_out?.toLocaleTimeString()}
+                  </td>
+                  <td
+                    className="cursor-pointer px-2 py-1 hover:bg-green-50 sm:px-6 sm:py-4"
+                    onClick={() => {
                       employee.Attendance[0]?.break_in &&
                         employee.Attendance[0]?.break_in_image &&
                         setOpenModal({
@@ -140,19 +157,7 @@ const HRDashboard = () => {
                   >
                     {employee.Attendance[0]?.break_out?.toLocaleTimeString()}
                   </td>
-                  <td
-                    className="cursor-pointer px-2 py-1 hover:bg-green-50 sm:px-6 sm:py-4"
-                    onClick={() => {
-                      employee.Attendance[0]?.time_out &&
-                        employee.Attendance[0]?.time_out_image &&
-                        setOpenModal({
-                          link: employee.Attendance[0]?.time_out_image,
-                          isOpen: true,
-                        });
-                    }}
-                  >
-                    {employee.Attendance[0]?.time_out?.toLocaleTimeString()}
-                  </td>
+
                   <td>
                     <button
                       className="rounded p-2 text-gray-500 hover:bg-green-200"
