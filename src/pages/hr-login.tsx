@@ -67,7 +67,7 @@ const HRLogin = () => {
                 }}
               />
             </div>
-          </div>
+        </div>
           <button type="submit" className="button w-32 !rounded-full">
             Sign in
           </button>

@@ -29,7 +29,7 @@ const EmployeeDashboard = () => {
   }, []);
 
   return (
-    <main className="mx-auto max-w-screen-lg space-y-4 p-4 text-center">
+    <main className="mx-auto min-h-[88vh] max-w-screen-lg space-y-4 p-4 text-center">
       <div className="space-y-1">
         <h1 className="text-2xl font-bold">Employee Dashboard</h1>
         <p className="font-bold">
@@ -62,7 +62,7 @@ const EmployeeDashboard = () => {
             }}
           >
             <div>
-              <h2 className="text-lg font-bold">Time In:</h2>
+              <h2 className="text-lg font-bold">Morning In:</h2>
 
               {attendanceQuery.data.time_in ? (
                 <p>{attendanceQuery.data.time_in.toLocaleTimeString()}</p>
@@ -87,7 +87,9 @@ const EmployeeDashboard = () => {
                       className="button"
                       disabled={attendanceMutation.isLoading || !images?.timeIn}
                     >
-                      {attendanceMutation.isLoading ? "Loading..." : "Time In"}
+                      {attendanceMutation.isLoading
+                        ? "Loading..."
+                        : "Morning In"}
                     </button>
 
                     <button
@@ -138,6 +140,105 @@ const EmployeeDashboard = () => {
             className="flex flex-col justify-center gap-y-2 rounded border p-4"
             onSubmit={(e) => {
               e.preventDefault();
+              if (!images?.timeOut) return;
+
+              const reader = new FileReader();
+              reader.readAsDataURL(images.timeOut);
+              reader.onload = async () => {
+                await attendanceMutation.mutateAsync({
+                  type: "TIME_OUT",
+                  imageBase64: reader.result as string,
+                  attendanceId: attendanceQuery.data.id,
+                });
+                setImages({ ...images, timeOut: undefined });
+                await attendanceQuery.refetch();
+              };
+            }}
+          >
+            <div>
+              <h2 className="text-lg font-bold">Morning Out:</h2>
+
+              {attendanceQuery.data.time_out ? (
+                <p>{attendanceQuery.data.time_out.toLocaleTimeString()}</p>
+              ) : (
+                <div className="space-y-4">
+                  <p>{time ? time : "Loading..."}</p>
+                  <input
+                    type="file"
+                    required
+                    hidden
+                    accept="image/*"
+                    onChange={(e) => {
+                      e.target.files &&
+                        setImages({ timeOut: e.target.files[0] });
+                      e.target.value = "";
+                    }}
+                    ref={timeOutUploadRef}
+                  />
+                  <div className="flex flex-col justify-center gap-y-1">
+                    <button
+                      type="submit"
+                      className="button"
+                      disabled={
+                        attendanceMutation.isLoading || !images?.timeOut
+                      }
+                    >
+                      {attendanceMutation.isLoading
+                        ? "Loading..."
+                        : "Morning Out"}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="button text-sm"
+                      // disabled={
+                      //   attendanceMutation.isLoading ||
+                      //   !attendanceQuery.data.time_in
+                      // }
+                      onClick={() => {
+                        !images?.timeOut
+                          ? timeOutUploadRef.current?.click()
+                          : setImages({ ...images, timeOut: undefined });
+                      }}
+                    >
+                      {!images?.timeOut ? "Upload Image" : "Clear"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            {images?.timeOut && (
+              <div className="relative aspect-square w-full">
+                <Image
+                  src={URL.createObjectURL(images.timeOut)}
+                  alt=""
+                  fill
+                  style={{
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            )}
+
+            {attendanceQuery.data.time_out_image && (
+              <div className="relative aspect-square w-full">
+                <Image
+                  src={attendanceQuery.data.time_out_image}
+                  alt=""
+                  fill
+                  style={{
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            )}
+          </form>
+
+          <form
+            noValidate
+            className="flex flex-col justify-center gap-y-2 rounded border p-4"
+            onSubmit={(e) => {
+              e.preventDefault();
               if (!images?.breakIn) return;
 
               const reader = new FileReader();
@@ -154,7 +255,7 @@ const EmployeeDashboard = () => {
             }}
           >
             <div>
-              <h2 className="text-lg font-bold">Break In:</h2>
+              <h2 className="text-lg font-bold">Afternoon In:</h2>
 
               {attendanceQuery.data.break_in ? (
                 <p>{attendanceQuery.data.break_in.toLocaleTimeString()}</p>
@@ -181,17 +282,19 @@ const EmployeeDashboard = () => {
                         attendanceMutation.isLoading || !images?.breakIn
                       }
                     >
-                      {attendanceMutation.isLoading ? "Loading..." : "Break In"}
+                      {attendanceMutation.isLoading
+                        ? "Loading..."
+                        : "Afternoon In"}
                     </button>
 
                     <button
                       type="button"
                       className="button text-sm"
-                      disabled={
-                        attendanceMutation.isLoading ||
-                        !attendanceQuery.data.time_in ||
-                        !!attendanceQuery.data.time_out
-                      }
+                      // disabled={
+                      //   attendanceMutation.isLoading ||
+                      //   !attendanceQuery.data.time_in ||
+                      //   !!attendanceQuery.data.time_out
+                      // }
                       onClick={() => {
                         !images?.breakIn
                           ? breakInUploadRef.current?.click()
@@ -252,7 +355,7 @@ const EmployeeDashboard = () => {
             }}
           >
             <div>
-              <h2 className="text-lg font-bold">Break Out:</h2>
+              <h2 className="text-lg font-bold">Afternoon Out:</h2>
 
               {attendanceQuery.data.break_out ? (
                 <p>{attendanceQuery.data.break_out.toLocaleTimeString()}</p>
@@ -281,17 +384,17 @@ const EmployeeDashboard = () => {
                     >
                       {attendanceMutation.isLoading
                         ? "Loading..."
-                        : "Break Out"}
+                        : "Afternoon Out"}
                     </button>
 
                     <button
                       type="button"
                       className="button text-sm"
-                      disabled={
-                        attendanceMutation.isLoading ||
-                        !attendanceQuery.data.break_in ||
-                        !!attendanceQuery.data.time_out
-                      }
+                      // disabled={
+                      //   attendanceMutation.isLoading ||
+                      //   !attendanceQuery.data.break_in ||
+                      //   !!attendanceQuery.data.time_out
+                      // }
                       onClick={() => {
                         !images?.breakOut
                           ? breakOutUploadRef.current?.click()
@@ -321,103 +424,6 @@ const EmployeeDashboard = () => {
               <div className="relative aspect-square w-full">
                 <Image
                   src={attendanceQuery.data.break_out_image}
-                  alt=""
-                  fill
-                  style={{
-                    objectFit: "cover",
-                  }}
-                />
-              </div>
-            )}
-          </form>
-
-          <form
-            noValidate
-            className="flex flex-col justify-center gap-y-2 rounded border p-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!images?.timeOut) return;
-
-              const reader = new FileReader();
-              reader.readAsDataURL(images.timeOut);
-              reader.onload = async () => {
-                await attendanceMutation.mutateAsync({
-                  type: "TIME_OUT",
-                  imageBase64: reader.result as string,
-                  attendanceId: attendanceQuery.data.id,
-                });
-                setImages({ ...images, timeOut: undefined });
-                await attendanceQuery.refetch();
-              };
-            }}
-          >
-            <div>
-              <h2 className="text-lg font-bold">Time Out:</h2>
-
-              {attendanceQuery.data.time_out ? (
-                <p>{attendanceQuery.data.time_out.toLocaleTimeString()}</p>
-              ) : (
-                <div className="space-y-4">
-                  <p>{time ? time : "Loading..."}</p>
-                  <input
-                    type="file"
-                    required
-                    hidden
-                    accept="image/*"
-                    onChange={(e) => {
-                      e.target.files &&
-                        setImages({ timeOut: e.target.files[0] });
-                      e.target.value = "";
-                    }}
-                    ref={timeOutUploadRef}
-                  />
-                  <div className="flex flex-col justify-center gap-y-1">
-                    <button
-                      type="submit"
-                      className="button"
-                      disabled={
-                        attendanceMutation.isLoading || !images?.timeOut
-                      }
-                    >
-                      {attendanceMutation.isLoading ? "Loading..." : "Time Out"}
-                    </button>
-
-                    <button
-                      type="button"
-                      className="button text-sm"
-                      disabled={
-                        attendanceMutation.isLoading ||
-                        !attendanceQuery.data.time_in
-                      }
-                      onClick={() => {
-                        !images?.timeOut
-                          ? timeOutUploadRef.current?.click()
-                          : setImages({ ...images, timeOut: undefined });
-                      }}
-                    >
-                      {!images?.timeOut ? "Upload Image" : "Clear"}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-            {images?.timeOut && (
-              <div className="relative aspect-square w-full">
-                <Image
-                  src={URL.createObjectURL(images.timeOut)}
-                  alt=""
-                  fill
-                  style={{
-                    objectFit: "cover",
-                  }}
-                />
-              </div>
-            )}
-
-            {attendanceQuery.data.time_out_image && (
-              <div className="relative aspect-square w-full">
-                <Image
-                  src={attendanceQuery.data.time_out_image}
                   alt=""
                   fill
                   style={{
